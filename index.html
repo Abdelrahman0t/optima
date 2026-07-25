@@ -111,20 +111,60 @@
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
         }
 
-        .hero-fade-in {
-            animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Scroll-Triggered Reveal System */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: opacity, transform;
+            transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes fadeIn {
+        .reveal-on-scroll.is-revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger Children Sequences */
+        .stagger-1 { transition-delay: 100ms !important; }
+        .stagger-2 { transition-delay: 200ms !important; }
+        .stagger-3 { transition-delay: 300ms !important; }
+        .stagger-4 { transition-delay: 400ms !important; }
+        .stagger-5 { transition-delay: 500ms !important; }
+        .stagger-6 { transition-delay: 600ms !important; }
+        .stagger-7 { transition-delay: 700ms !important; }
+        .stagger-8 { transition-delay: 800ms !important; }
+
+        /* Hero On-Load Sequential Animations (150ms step, completing within 1.2s) */
+        @keyframes heroFadeUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        .hero-anim-1 {
+            opacity: 0;
+            animation: heroFadeUp 700ms cubic-bezier(0.16, 1, 0.3, 1) 0ms forwards;
+        }
+
+        .hero-anim-2 {
+            opacity: 0;
+            animation: heroFadeUp 700ms cubic-bezier(0.16, 1, 0.3, 1) 150ms forwards;
+        }
+
+        .hero-anim-3 {
+            opacity: 0;
+            animation: heroFadeUp 700ms cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards;
+        }
+
+        .hero-anim-4 {
+            opacity: 0;
+            animation: heroFadeUp 700ms cubic-bezier(0.16, 1, 0.3, 1) 450ms forwards;
         }
 
         .curved-underline::after {
@@ -196,7 +236,54 @@
             color: #1b1b1f !important;
         }
 
-        /* Custom Map Pin Marker Styling */
+        /* Signature Map Pin Radar & Selection Pulse Animations */
+        @keyframes pinRadarReveal {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            65% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pinPulseRing {
+            0% {
+                transform: scale(0.6);
+                opacity: 0.95;
+                border-color: #F5BF03;
+            }
+            100% {
+                transform: scale(2.6);
+                opacity: 0;
+                border-color: rgba(245, 191, 3, 0);
+            }
+        }
+
+        @keyframes pinSelectionPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.7);
+                box-shadow: 0 0 35px rgba(245, 191, 3, 1);
+            }
+            100% {
+                transform: scale(1.35);
+                box-shadow: 0 0 25px rgba(245, 191, 3, 0.9);
+            }
+        }
+
+        .custom-map-pin-wrapper {
+            background: transparent !important;
+            border: none !important;
+        }
+
         .custom-map-pin {
             width: 24px;
             height: 24px;
@@ -204,11 +291,39 @@
             border: 2.5px solid #745b1b;
             border-radius: 50%;
             box-shadow: 0 0 14px rgba(116, 91, 27, 0.5);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: background-color 300ms ease-out, border-color 300ms ease-out, transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms ease-out;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        /* Unrevealed State before Section Scroll Reveal */
+        .custom-map-pin.pin-unrevealed {
+            opacity: 0 !important;
+            transform: scale(0) !important;
+        }
+
+        /* Radar Animated State */
+        .custom-map-pin.pin-radar-anim {
+            animation: pinRadarReveal 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Radar Expanding Gold Ring Pseudo-element */
+        .custom-map-pin.pin-radar-anim::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border: 2px solid #F5BF03;
+            border-radius: 50%;
+            animation: pinPulseRing 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: none;
+        }
+
+        /* Selection Pulse State on District Click */
+        .custom-map-pin.pin-select-pulse {
+            animation: pinSelectionPulse 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
         }
 
         .custom-map-pin::after {
@@ -217,12 +332,13 @@
             height: 6px;
             background-color: #F5BF03;
             border-radius: 50%;
+            transition: background-color 300ms ease-out;
         }
 
         .custom-map-pin:hover, .custom-map-pin.active {
             background-color: #F5BF03;
             border-color: #1b1b1f;
-            transform: scale(1.4);
+            transform: scale(1.35);
             box-shadow: 0 0 25px rgba(245, 191, 3, 0.9);
             z-index: 1000 !important;
         }
@@ -234,6 +350,29 @@
         .leaflet-container {
             font-family: 'Hanken Grotesk', sans-serif;
             background-color: #f6f2f7;
+        }
+
+        /* Property Cards Hover (Scale 1.03, 300ms ease on image only) */
+        .property-card img {
+            transition: transform 300ms ease-out !important;
+        }
+
+        .property-card:hover img {
+            transform: scale(1.03) !important;
+        }
+
+        /* District List Rows Hover Transition (200ms) */
+        .district-btn {
+            transition: background-color 200ms ease-out, border-color 200ms ease-out, color 200ms ease-out, transform 200ms ease-out !important;
+        }
+
+        /* CTA Buttons & Interactive Elements Smooth Transition (250ms) */
+        a.font-button,
+        button.font-button,
+        .font-button,
+        a.bg-primary,
+        a.bg-\[\#F5BF03\] {
+            transition: background-color 250ms ease-out, color 250ms ease-out, border-color 250ms ease-out, transform 250ms ease-out, opacity 250ms ease-out, box-shadow 250ms ease-out !important;
         }
 
         /* Custom District List Scrollbar */
@@ -305,21 +444,21 @@
         </div>
     </nav>
     <!-- Hero Section -->
-    <section class="relative min-h-screen w-full flex items-center overflow-hidden hero-fade-in pt-20 pb-16 md:py-0" id="home">
+    <section class="relative min-h-screen w-full flex items-center overflow-hidden pt-20 pb-16 md:py-0" id="home">
         <div class="absolute inset-0 z-0">
             <img alt="Luxury Real Estate" class="w-full h-full object-cover"
                 src="Where-Cityzen-Mostakbal-City-Compound.jpg">
             <div class="absolute inset-0 bg-primary-container/60 mix-blend-multiply"></div>
         </div>
         <div class="relative z-10 px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto w-full text-on-primary">
-            <div class="max-w-3xl space-y-4 sm:space-y-6 hero-fade-in opacity-0" style="animation-delay: 0.2s">
-                <h1 class="font-display-lg text-4xl sm:text-6xl lg:text-display-lg leading-tight font-bold tracking-tight">OPTIMA</h1>
-                <p class="font-headline-md text-xl sm:text-2xl md:text-headline-md italic opacity-90 border-l-2 border-secondary pl-4 sm:pl-6">
+            <div class="max-w-3xl space-y-4 sm:space-y-6">
+                <h1 class="font-display-lg text-4xl sm:text-6xl lg:text-display-lg leading-tight font-bold tracking-tight hero-anim-1">OPTIMA</h1>
+                <p class="font-headline-md text-xl sm:text-2xl md:text-headline-md italic opacity-90 border-l-2 border-secondary pl-4 sm:pl-6 hero-anim-2">
                     Elevating Excellence</p>
-                <p class="font-body-lg text-base sm:text-lg text-surface-variant/80 max-w-xl leading-relaxed">Curated real estate opportunities
+                <p class="font-body-lg text-base sm:text-lg text-surface-variant/80 max-w-xl leading-relaxed hero-anim-3">Curated real estate opportunities
                     across New Cairo. We define the benchmark for sophisticated living in Egypt's most prestigious
                     districts.</p>
-                <div class="pt-6 sm:pt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <div class="pt-6 sm:pt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto hero-anim-4">
                     <!-- Hero Explore Collection Button: Active Yellow, Clean Solid Color, Non-glowy -->
                     <a class="bg-[#F5BF03] hover:bg-[#d9a700] text-[#1b1b1f] font-bold px-8 sm:px-10 py-4 sm:py-5 font-button text-base sm:text-lg tracking-widest active:scale-95 transition-all duration-200 text-center rounded-sm"
                         href="#properties">EXPLORE COLLECTION</a>
@@ -334,8 +473,8 @@
         </div>
     </section>
     <!-- Featured Properties Grid -->
-    <section class="py-16 md:py-section-gap px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto hero-fade-in" id="properties">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10 md:mb-16">
+    <section class="py-16 md:py-section-gap px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto" id="properties">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10 md:mb-16 reveal-on-scroll">
             <div class="space-y-2 sm:space-y-4">
                 <span class="font-label-caps text-secondary uppercase tracking-[0.2em]">Curated Portfolio</span>
                 <h2 class="font-headline-md text-2xl sm:text-3xl md:text-headline-md">Featured Opportunities</h2>
@@ -349,10 +488,10 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-gutter min-h-[620px]">
             <!-- Row 1, Card 1 -->
-            <div class="property-card group cursor-pointer" data-district="Katameya">
+            <div class="property-card group cursor-pointer reveal-on-scroll stagger-1" data-district="Katameya">
                 <div class="overflow-hidden mb-4 sm:mb-6 aspect-[4/5] bg-surface-container">
                     <img alt="Luxury Apartment"
-                        class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                         src="Screenshot 2026-07-25 062009.png">
                 </div>
                 <div class="space-y-2">
@@ -369,10 +508,10 @@
                 </div>
             </div>
             <!-- Row 1, Card 2 -->
-            <div class="property-card group cursor-pointer" data-district="Katameya">
+            <div class="property-card group cursor-pointer reveal-on-scroll stagger-2" data-district="Katameya">
                 <div class="overflow-hidden mb-4 sm:mb-6 aspect-[4/5] bg-surface-container">
                     <img alt="Waterside Chalet"
-                        class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDs-v3Cjjm8ssH032aY60mO4UiV969qympwXnchwLq12b0gLK-8kN8S_GBaIcOUlhUjFMXDqfCGbP_JJIBDkYZILQQL5tQaAPXurTnqSNvyG4KwKNI2-IHOqLuTWqGRGVqMYxrs7zLHkdL1mUD2OKTtKEEzDmHEgZfmh9ZAEmPX3_lFTzHMYTmjVckN_r9It3w9tcGtXAEITkvaQWYuLaOYP40aZZpjaRUYtTrVy9YbrCZK8Q5X1ZAksfHpVEMg5ZbqOkED3u-jcliX6w">
                 </div>
                 <div class="space-y-2">
@@ -389,10 +528,10 @@
                 </div>
             </div>
             <!-- Row 1, Card 3 -->
-            <div class="property-card group cursor-pointer" data-district="Mostakbal City">
+            <div class="property-card group cursor-pointer reveal-on-scroll stagger-3" data-district="Mostakbal City">
                 <div class="overflow-hidden mb-4 sm:mb-6 aspect-[4/5] bg-surface-container">
                     <img alt="Modern Villa"
-                        class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9mkE43uLC_v7jZ0KhZZmmr6pAGbEhzUXNYT-tCTXYQtxYuH3gsjYjNd2cbldtExYy2sW60e6Aur4kPb2s7TVorsvGkIcE0ty7lsmac_azN45FPz9OAF-RqgkyHaSoG3NMxPdqS2ki5zb_58pDCuqNktmWWW2Fo35g3Iex6HIxTiKdhpaP6RdDN_0Bb42WIRk37On4vNImOIa1qLhF7YvCJfMYOUOnJ-SMHy5J5SaE5SkZSn6ZBGiVatBoKVYm7gYwCthE8GepNo">
                 </div>
                 <div class="space-y-2">
@@ -409,10 +548,10 @@
                 </div>
             </div>
             <!-- Row 2, Card 1 -->
-            <div class="property-card group cursor-pointer" data-district="Fifth Settlement">
+            <div class="property-card group cursor-pointer reveal-on-scroll stagger-4" data-district="Fifth Settlement">
                 <div class="overflow-hidden mb-4 sm:mb-6 aspect-[4/5] bg-surface-container">
                     <img alt="Contemporary Townhouse"
-                        class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_FjMRENlJnk9OPT9CU5GA8XTexiZA8NUyUCkEeQZs5ZdxUI0Dq_e46C3awWkKs_vW41mTLg-zRJ1kIwsClSkVV0QWmzVTwjIUsILowsAKBNbPNOEMczqetj-2RCR4OaFMV2aRvVVseGUiujFqfpaUERV6ue145nh97wWX_LAdZlkSz1pzwM8AtSP1sHYypakLnheL4SCZYSIDAlH3ncdtOYVt-Hfgv2jKuvjv8rrjvqYb5spHsNiYz1oovlqvxMnif_T7r6o3Lc-Xpw">
                 </div>
                 <div class="space-y-2">
@@ -429,10 +568,10 @@
                 </div>
             </div>
             <!-- Row 2, Card 2 -->
-            <div class="property-card group cursor-pointer" data-district="Fifth Settlement">
+            <div class="property-card group cursor-pointer reveal-on-scroll stagger-5" data-district="Fifth Settlement">
                 <div class="overflow-hidden mb-4 sm:mb-6 aspect-[4/5] bg-surface-container">
                     <img alt="Standalone Villa"
-                        class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUzGOzBrQcId9v0S6cgNJ-uS147445wbvLVL7T_FnyxSaqcK8svMxa6IXPvfnx3CT_mmWhq6kV6gVkbeTUbM4U6RkpIcP2T7WbaYNPdM53H7GRxGJvYSBhJDMnuuXUtlbP_Y04M1PrlgC43qVTl5tkmNC6binsQS32gi4SlotLHT4pDAH2gisiqzp52CV2ejIBbjkIysmQHKlT4bXC9vSGUcHbRjH_NrV172duOScuK50iXd5GvWIzSjcC6EHLrTKOP_4vtzgGGgwFFg">
                 </div>
                 <div class="space-y-2">
@@ -449,10 +588,10 @@
                 </div>
             </div>
             <!-- Row 2, Card 3 -->
-            <div class="property-card group cursor-pointer" data-district="Mostakbal City">
+            <div class="property-card group cursor-pointer reveal-on-scroll stagger-6" data-district="Mostakbal City">
                 <div class="overflow-hidden mb-4 sm:mb-6 aspect-[4/5] bg-surface-container">
                     <img alt="Sea View Chalet"
-                        class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKEEZ1gjKbxLHW7bTIOCJ3SqjuYmLNgDiRNmysbsw5acdcrkv3Nn-0uM6MyTxayXcSDmp9YAQig80DuBqJHgw4eGWrytfPZRDWG_pEaAQ-5pdx4fvun-fSPdkZW2SR1Ps9FKOhi2zO_ElG72DgaK0tZgO_E1pZvEFi2QQA83Nrw_rJ4KTKGZcPMK4hnenZMUsKKfrALzhCMWw64dQqErmpQ9ohzypuhBD5le7ZOkewODua7AZS8txNFoSMbzmcBZ7bfaw4ZxGFwGfYqA">
                 </div>
                 <div class="space-y-2">
@@ -471,9 +610,9 @@
         </div>
     </section>
     <!-- About Optima -->
-    <section class="bg-primary text-on-primary py-16 md:py-section-gap overflow-hidden hero-fade-in" id="about">
+    <section class="bg-primary text-on-primary py-16 md:py-section-gap overflow-hidden" id="about">
         <div class="px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
-            <div class="space-y-8 sm:space-y-12">
+            <div class="space-y-8 sm:space-y-12 reveal-on-scroll">
                 <div class="space-y-4 sm:space-y-6">
                     <span class="font-label-caps text-secondary uppercase tracking-[0.2em]">About Optima</span>
                     <h2 class="font-display-lg text-3xl sm:text-5xl lg:text-display-lg leading-tight">Elevating Excellence<br class="hidden sm:inline">in Property Services.</h2>
@@ -503,7 +642,7 @@
                     </div>
                 </div>
             </div>
-            <div class="relative pb-8 lg:pb-0">
+            <div class="relative pb-8 lg:pb-0 reveal-on-scroll stagger-2">
                 <div class="aspect-[3/4] overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000">
                     <img alt="Architectural Detail" class="w-full h-full object-cover"
                         src="screen11.png">
@@ -516,14 +655,14 @@
         </div>
     </section>
     <!-- Why Optima / Services -->
-    <section class="py-16 md:py-section-gap px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto hero-fade-in">
-        <div class="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4">
+    <section class="py-16 md:py-section-gap px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto">
+        <div class="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4 reveal-on-scroll">
             <span class="font-label-caps text-secondary font-bold uppercase tracking-[0.2em]">The Optima Advantage</span>
             <h2 class="font-display-lg text-2xl sm:text-4xl lg:text-[48px]">Comprehensive Property Services</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-8">
             <!-- Service 1 -->
-            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden">
+            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden reveal-on-scroll stagger-1">
                 <div class="absolute top-0 left-0 w-full h-1 bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div>
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-secondary/10 text-secondary border border-secondary/20 flex items-center justify-center group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300 rounded-sm mb-4 sm:mb-6">
@@ -534,7 +673,7 @@
                 </div>
             </div>
             <!-- Service 2 -->
-            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden">
+            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden reveal-on-scroll stagger-2">
                 <div class="absolute top-0 left-0 w-full h-1 bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div>
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-secondary/10 text-secondary border border-secondary/20 flex items-center justify-center group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300 rounded-sm mb-4 sm:mb-6">
@@ -545,7 +684,7 @@
                 </div>
             </div>
             <!-- Service 3 -->
-            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden">
+            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden reveal-on-scroll stagger-3">
                 <div class="absolute top-0 left-0 w-full h-1 bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div>
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-secondary/10 text-secondary border border-secondary/20 flex items-center justify-center group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300 rounded-sm mb-4 sm:mb-6">
@@ -556,7 +695,7 @@
                 </div>
             </div>
             <!-- Service 4 -->
-            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden">
+            <div class="p-6 sm:p-8 bg-surface-bright border border-outline-variant/30 hover:border-secondary/60 rounded-sm transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col justify-between group h-full relative overflow-hidden reveal-on-scroll stagger-4">
                 <div class="absolute top-0 left-0 w-full h-1 bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div>
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-secondary/10 text-secondary border border-secondary/20 flex items-center justify-center group-hover:bg-secondary group-hover:text-on-secondary transition-all duration-300 rounded-sm mb-4 sm:mb-6">
@@ -569,29 +708,29 @@
         </div>
     </section>
     <!-- Gallery / Lifestyle Section -->
-    <section class="pb-16 md:pb-section-gap px-2 sm:px-4 md:px-0 hero-fade-in">
+    <section class="pb-16 md:pb-section-gap px-2 sm:px-4 md:px-0">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-square overflow-hidden reveal-on-scroll stagger-1">
                 <img class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000"
                     data-alt="Close up of high-end interior design featuring a marble coffee table and velvet armchairs in a sun-drenched minimalist living room with neutral tones."
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWOQlfvVS1zdqCaleVgPnCfpSOTk7AMGOTgxgae8YUsjYQmQf7SAe8ZS18TNsOAgg-5wL2coVOZyONBelulvZ3U68jD1lP39q3G-hgIwULgFJ0DQnygo59gLG_bDHfVtLCeO_F27Yo-v6utk9fTfCDvXXSYNlDrMPeNwNIoybqjw_cXnOB__iUckLmVG4vfH4UHUQbN_M9sNAVkfkApDPagYMIL04dj1OHi0CH0i2Ix6u8HhuWIMaLn3oOy1jS08_oRZxYCooxNrmoLQ">
             </div>
-            <div class="aspect-square overflow-hidden md:col-span-2 md:row-span-2">
+            <div class="aspect-square overflow-hidden md:col-span-2 md:row-span-2 reveal-on-scroll stagger-2">
                 <img class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000"
                     data-alt="A wide cinematic shot of a luxury villa exterior at sunset in New Cairo, with glowing pool lights and warm interior lighting illuminating large floor-to-ceiling glass windows."
                     src="aerial_view_of_a_luxury_gated_community_in_mostakbal_city_new_cairo._organized.png">
             </div>
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-square overflow-hidden reveal-on-scroll stagger-3">
                 <img class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000"
                     data-alt="Abstract architectural detail of a modern building facade with gold brass panels and white marble columns in high contrast editorial style."
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRlV8HDxSeT621HN-tJoJL7rT1nO4oKKKPoi4ykUBgmuHuA03CdtwO6FpUYtC2XwaAgVb2DNLqxWenDiXI9xGgb0eXngKDU0yOzb_A6NrcWWAZbpYCdy7q3UsvORF7gXX3l1ow7yQi6-1B-kZvCPNDyd31iBn7wevgF9OUrGL26t-XT2cDNZtA5Ypx6bFF3P7U5XjCaADqKML_2phsHatMNxFmzvSGrNTogjarGWj87bD4sq15drMXjzN6lYZmqsUHWvWvOoYRsTE">
             </div>
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-square overflow-hidden reveal-on-scroll stagger-4">
                 <img class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000"
                     data-alt="A lush green private garden in a gated community in Egypt, featuring palm trees and contemporary outdoor furniture under a clear blue sky."
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTOLWUk5zc3nbbGf9YK2-hWLU_HUvXn9tJ1iA4EU_a5v2e-Y_pC0TVmXgZ-zDacnaOtEs1D6P_JyEl_jpnEl12Va4oIo4MGfuXIbORSyiEj9LJ3hC4p7LRNNg09hlt71rpVT7YEJGXfIM011vtPMuIqMewFURPKfKnHynNZ1A-AyTkIh_Jl25MSNj2G-SxGYkKkI24Wzth3QU8GfYJvcVcp5qGAInoP4aBEhVY7DocxKKpIIJejnmmOIhrvxkhq-TtjIL6_ZqLvDE">
             </div>
-            <div class="col-span-2 md:col-span-1 aspect-[16/9] md:aspect-square overflow-hidden">
+            <div class="col-span-2 md:col-span-1 aspect-[16/9] md:aspect-square overflow-hidden reveal-on-scroll stagger-5">
                 <img class="w-full h-full object-cover hover:scale-110 transition-transform duration-1000"
                     data-alt="A professional real estate advisor presenting a luxury home to a client in a bright modern office with architectural models on the table."
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDemHRgvEv9htQHMMp20Nqk3rLy5sKXGdsqvFXd96R0TSwgMge_mAEqyM-m-N0eu69EqyEbQF8xYszB3dqge1zSQopV9zs78K3XLndXKvtwyC8fCBWCi36HSLBNyusTkVZnZPVBGQSxoIcIcnTejranHvZSysgXbxOkY1n0Ki_LIyQ0TwUPRHuKLxlj0UfQk3J4KUz4nuWdLQF-YEFQPtpOJPn3NTh3iACeLHL2U5N4rIN0LBVKt97SwArxZVgw-COeiLfmNLWg8oh1gg">
@@ -599,8 +738,8 @@
         </div>
     </section>
     <!-- Testimonials -->
-    <section class="py-16 md:py-section-gap bg-surface-container-low hero-fade-in">
-        <div class="px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto text-center max-w-3xl">
+    <section class="py-16 md:py-section-gap bg-surface-container-low">
+        <div class="px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto text-center max-w-3xl reveal-on-scroll">
             <span class="material-symbols-outlined text-secondary text-4xl sm:text-5xl mb-6 sm:mb-8">format_quote</span>
             <p class="font-headline-md italic text-primary leading-relaxed text-lg sm:text-2xl md:text-headline-md mb-8 sm:mb-12">
                 "Working with Optima wasn't just a transaction; it was a journey toward our family's future. Their eye
@@ -613,9 +752,9 @@
         </div>
     </section>
     <!-- Location / Map Section -->
-    <section class="py-16 md:py-section-gap px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto hero-fade-in" id="focus">
+    <section class="py-16 md:py-section-gap px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto" id="focus">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-16 items-stretch">
-            <div class="lg:col-span-1 space-y-5 sm:space-y-6 flex flex-col justify-between">
+            <div class="lg:col-span-1 space-y-5 sm:space-y-6 flex flex-col justify-between reveal-on-scroll">
                 <div class="space-y-2 sm:space-y-3">
                     <span class="font-label-caps text-secondary font-bold uppercase tracking-[0.2em]">Our Focus</span>
                     <h2 class="font-headline-md text-2xl sm:text-3xl md:text-[40px] leading-tight">New Cairo's Prime Districts</h2>
@@ -648,9 +787,9 @@
                             class="district-btn w-full flex justify-between items-center py-2.5 px-4 border-l-4 border-transparent text-on-surface-variant hover:text-on-surface hover:border-secondary/60 hover:bg-surface-container/40 transition-all text-left rounded-r-sm" data-district="Katameya">
                             <span class="font-headline-sm text-sm sm:text-base">Katameya</span>
                         </button>
-                        <button type="button" onclick="selectDistrict('El Tagamoa El Awal')"
-                            class="district-btn w-full flex justify-between items-center py-2.5 px-4 border-l-4 border-transparent text-on-surface-variant hover:text-on-surface hover:border-secondary/60 hover:bg-surface-container/40 transition-all text-left rounded-r-sm" data-district="El Tagamoa El Awal">
-                            <span class="font-headline-sm text-sm sm:text-base">El Tagamoa El Awal</span>
+                        <button type="button" onclick="selectDistrict('El Tagamoa El Khames')"
+                            class="district-btn w-full flex justify-between items-center py-2.5 px-4 border-l-4 border-transparent text-on-surface-variant hover:text-on-surface hover:border-secondary/60 hover:bg-surface-container/40 transition-all text-left rounded-r-sm" data-district="El Tagamoa El Khames">
+                            <span class="font-headline-sm text-sm sm:text-base">El Tagamoa El Khames</span>
                         </button>
                         <button type="button" onclick="selectDistrict('Rehab City')"
                             class="district-btn w-full flex justify-between items-center py-2.5 px-4 border-l-4 border-transparent text-on-surface-variant hover:text-on-surface hover:border-secondary/60 hover:bg-surface-container/40 transition-all text-left rounded-r-sm" data-district="Rehab City">
@@ -671,7 +810,7 @@
                     </div>
                 </div>
             </div>
-            <div class="lg:col-span-2 h-[380px] sm:h-[460px] lg:h-auto min-h-[480px] bg-surface-container relative group rounded-sm overflow-hidden border border-outline-variant/30 shadow-md">
+            <div class="lg:col-span-2 h-[380px] sm:h-[460px] lg:h-auto min-h-[480px] bg-surface-container relative group rounded-sm overflow-hidden border border-outline-variant/30 shadow-md reveal-on-scroll stagger-2">
                 <div id="new-cairo-map" class="w-full h-full z-10"></div>
                 <!-- Cohesive Map Quick Card Overlay -->
                 <div id="map-district-card" class="absolute bottom-5 left-5 right-5 sm:right-auto z-20 bg-surface-bright/95 backdrop-blur-md p-4 sm:p-5 rounded-sm border border-outline-variant/40 shadow-xl max-w-sm transition-all duration-300">
@@ -706,7 +845,7 @@
     </a>
 
     <!-- Footer -->
-    <footer class="bg-primary text-on-primary py-16 md:py-section-gap border-t border-on-primary/10 hero-fade-in" id="contact">
+    <footer class="bg-primary text-on-primary py-16 md:py-section-gap border-t border-on-primary/10 reveal-on-scroll" id="contact">
         <div class="px-4 sm:px-8 md:px-margin-desktop max-w-container-max mx-auto">
             <!-- Brand Footer Content -->
             <div class="flex flex-col items-center gap-8 sm:gap-12 text-center">
@@ -801,24 +940,23 @@
         window.addEventListener('scroll', handleScrollSpy);
         window.addEventListener('load', handleScrollSpy);
 
-        // Intersection Observer for Fade-in effects
-        const observerOptions = {
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('hero-fade-in');
-                    entry.target.classList.remove('opacity-0');
-                    observer.unobserve(entry.target);
-                }
+        // Premium Scroll-Triggered Reveal Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealElements = document.querySelectorAll('.reveal-on-scroll');
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-revealed');
+                        observer.unobserve(entry.target); // Trigger once per element
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.08,
+                rootMargin: '0px 0px -30px 0px'
             });
-        }, observerOptions);
 
-        document.querySelectorAll('section').forEach(section => {
-            section.classList.add('opacity-0');
-            observer.observe(section);
+            revealElements.forEach(el => revealObserver.observe(el));
         });
 
         // Interactive Leaflet Map for New Cairo Prime Districts
@@ -843,12 +981,12 @@
 
             const districtData = {
                 'Fifth Settlement': { coords: [30.0055, 31.4779], name: 'Fifth Settlement' },
-                'Mostakbal City': { coords: [30.0600, 31.6200], name: 'Mostakbal City' },
-                'Katameya': { coords: [29.9800, 31.4200], name: 'Katameya' },
-                'El Tagamoa El Awal': { coords: [30.0500, 31.4500], name: 'El Tagamoa El Awal' },
-                'Rehab City': { coords: [30.0600, 31.4900], name: 'Rehab City' },
-                'Madinaty': { coords: [30.0900, 31.6300], name: 'Madinaty' },
-                'Hyde Park': { coords: [29.9950, 31.4950], name: 'Hyde Park' },
+                'Mostakbal City': { coords: [30.0550, 31.6150], name: 'Mostakbal City' },
+                'Katameya': { coords: [29.9850, 31.4050], name: 'Katameya' },
+                'El Tagamoa El Khames': { coords: [30.0150, 31.4550], name: 'El Tagamoa El Khames' },
+                'Rehab City': { coords: [30.0620, 31.4920], name: 'Rehab City' },
+                'Madinaty': { coords: [30.1000, 31.6300], name: 'Madinaty' },
+                'Hyde Park': { coords: [29.9950, 31.4980], name: 'Hyde Park' },
                 'Cairo Festival City': { coords: [30.0300, 31.4050], name: 'Cairo Festival City' }
             };
 
@@ -857,9 +995,10 @@
             Object.keys(districtData).forEach(key => {
                 const d = districtData[key];
                 const pinIcon = L.divIcon({
-                    className: 'custom-map-pin',
-                    iconSize: [22, 22],
-                    iconAnchor: [11, 11]
+                    className: 'custom-map-pin-wrapper',
+                    html: `<div class="custom-map-pin pin-unrevealed"></div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
                 });
 
                 const marker = L.marker(d.coords, { icon: pinIcon }).addTo(map);
@@ -872,12 +1011,40 @@
                 markers[key] = marker;
             });
 
+            // Signature Moment: Staggered Radar-like Map Pin Reveal on Section Intersection
+            const mapSection = document.getElementById('focus');
+            let mapPinsRevealed = false;
+
+            if (mapSection) {
+                const mapObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !mapPinsRevealed) {
+                            mapPinsRevealed = true;
+                            const markerKeys = Object.keys(markers);
+                            markerKeys.forEach((key, index) => {
+                                setTimeout(() => {
+                                    const markerEl = markers[key].getElement();
+                                    const pinDot = markerEl ? markerEl.querySelector('.custom-map-pin') : null;
+                                    if (pinDot) {
+                                        pinDot.classList.remove('pin-unrevealed');
+                                        pinDot.classList.add('pin-radar-anim');
+                                    }
+                                }, index * 80); // Staggered by 80ms per pin
+                            });
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+
+                mapObserver.observe(mapSection);
+            }
+
             const districtDescriptions = {
                 'all': 'Explore prestigious developments and exclusive luxury properties across New Cairo\'s finest neighborhoods.',
                 'Fifth Settlement': 'Prestigious residential & commercial hub featuring luxury villas, compounds, and top tier amenities.',
                 'Mostakbal City': 'Ultra-modern master-planned green city with futuristic compounds and expansive parks.',
                 'Katameya': 'Exclusive luxury enclave renowned for elite golf heights, private estates, and tranquility.',
-                'El Tagamoa El Awal': 'Vibrant prime district with classic architecture, premier schools, and boutique retail centers.',
+                'El Tagamoa El Khames': 'Vibrant prime district with classic architecture, premier schools, and boutique retail centers.',
                 'Rehab City': 'Fully integrated gated city featuring lush green parks, shopping avenues, and tranquil living.',
                 'Madinaty': 'Sprawling luxury city with world-class golf courses, sports clubs, and serene landscaped vistas.',
                 'Hyde Park': 'High-end residential destination anchored by Egypt\'s largest private park and luxury villas.',
@@ -894,15 +1061,25 @@
 
                 // Reset pin highlights
                 Object.keys(markers).forEach(k => {
-                    const el = markers[k].getElement();
-                    if (el) el.classList.remove('active');
+                    const markerEl = markers[k].getElement();
+                    const pinDot = markerEl ? markerEl.querySelector('.custom-map-pin') : null;
+                    if (pinDot) pinDot.classList.remove('active', 'pin-select-pulse');
                 });
 
                 if (districtName !== 'all' && districtData[districtName]) {
                     const d = districtData[districtName];
                     map.flyTo(d.coords, 13, { duration: 1.2 });
-                    const el = markers[districtName].getElement();
-                    if (el) el.classList.add('active');
+                    const markerEl = markers[districtName].getElement();
+                    const pinDot = markerEl ? markerEl.querySelector('.custom-map-pin') : null;
+                    if (pinDot) {
+                        pinDot.classList.add('active');
+                        // Trigger signature pulse animation on district selection
+                        void pinDot.offsetWidth;
+                        pinDot.classList.add('pin-select-pulse');
+                        setTimeout(() => {
+                            pinDot.classList.remove('pin-select-pulse');
+                        }, 450);
+                    }
                     markers[districtName].openPopup();
                 } else if (districtName === 'all') {
                     map.flyTo([30.0250, 31.5000], 11, { duration: 1.2 });
